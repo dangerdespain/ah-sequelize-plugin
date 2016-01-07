@@ -1,3 +1,8 @@
+var path              = require('path');
+var fs                = require('fs');
+var Sequelize         = require('sequelize');
+var Umzug             = require('umzug');
+ 
 module.exports = {
   initialize: function(api, next){
 
