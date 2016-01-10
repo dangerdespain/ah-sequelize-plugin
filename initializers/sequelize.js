@@ -13,6 +13,14 @@ module.exports = {
       api.config.sequelize.password,
       api.config.sequelize
     );
+    
+    function frontLoadApiObj(SchemaExportFunc) {
+      if (SchemaExportFunc.length == 3) {
+        return function(a,b) { return SchemaExportFunc(a,b,api) }
+      } else {
+        return SchemaExportFunc;
+      }
+    };
 
     var umzug = new Umzug({
       storage: 'sequelize',
@@ -60,7 +68,8 @@ module.exports = {
         fs.readdirSync(dir).forEach(function(file){
           var nameParts = file.split("/");
           var name = nameParts[(nameParts.length - 1)].split(".")[0];
-          api.models[name] = api.sequelize.sequelize.import(dir + '/' + file);
+          var modelFunc = frontLoadApiObj(require(dir + '/' + file));
+          api.models[name] = api.sequelize.sequelize.import(capitalizeFirstLetter(name), modelFunc);
         });
 
         api.sequelize.test(next);
